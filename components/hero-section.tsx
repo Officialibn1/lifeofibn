@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowRight, Github, Linkedin, Mail, Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -31,15 +31,18 @@ export function HeroSection() {
 							<Link href='#contact'>
 								<Button
 									size='lg'
-									className='gap-2'>
+									className='gap-2 cursor-pointer'>
 									Get In Touch <ArrowRight className='w-4 h-4' />
 								</Button>
 							</Link>
-							<Link href='#projects'>
+							<Link
+								target='_blank'
+								href='https://docs.google.com/document/d/1uRJXlhI4zmCLvuPiFF8JwrbNBOlEgM6AbQTtEsCuAcY/edit?usp=sharing'>
 								<Button
 									size='lg'
-									variant='outline'>
-									View My Work
+									variant='outline'
+									className='gap-2 cursor-pointer'>
+									View My CV <Eye className='w-4 h-4' />
 								</Button>
 							</Link>
 						</div>

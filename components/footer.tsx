@@ -7,22 +7,22 @@ export function Footer() {
 	const socialLinks = [
 		{
 			name: "GitHub",
-			url: "https://github.com",
+			url: "https://github.com/Officialibn1",
 			icon: Github,
 		},
 		{
 			name: "LinkedIn",
-			url: "https://linkedin.com",
+			url: "https://linkedin.com/in/isah-muhammad-5046b125a/",
 			icon: Linkedin,
 		},
 		{
 			name: "Twitter",
-			url: "https://twitter.com",
+			url: "https://x.com/_lifeofibn",
 			icon: Twitter,
 		},
 		{
 			name: "Email",
-			url: "mailto:hello@example.com",
+			url: "mailto:lifeofibn@gmail.com",
 			icon: Mail,
 		},
 	];
@@ -73,17 +73,17 @@ export function Footer() {
 							About
 						</a>
 						<a
-							href='#'
+							href='#experience'
 							className='text-foreground/70 hover:text-foreground transition-colors text-sm'>
 							Experience
 						</a>
 						<a
-							href='#'
+							href='#projects'
 							className='text-foreground/70 hover:text-foreground transition-colors text-sm'>
 							Projects
 						</a>
 						<a
-							href='#'
+							href='#contact'
 							className='text-foreground/70 hover:text-foreground transition-colors text-sm'>
 							Contact
 						</a>
