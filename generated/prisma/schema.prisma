@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model experience {
+  id           String   @id @default(cuid())
+  company      String
+  role         String
+  type         String // e.g., "Hybrid", "Onsite", "Remote"
+  startDate    String
+  endDate      String // Can be "Present" for current roles
+  description  String
+  achievements String // JSON array stored as string
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model project {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  technologies String // JSON array stored as string
+  impact       String?
+  link         String?
+  image        String?
+  featured     Boolean  @default(false)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model skill {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  category  String // e.g., "Frontend", "Backend", "DevOps"
+  icon      String? // Icon identifier for rendering
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model product {
+  id          String         @id @default(cuid())
+  name        String
+  description String
+  features    String // JSON array stored as string
+  status      product_status @default(AVAILABLE) // e.g., "In Development", "Launching Soon", "Available"
+  image       String?
+  link        String?
+  order       Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String // Hashed password
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model contact_message {
+  id              String   @id @default(cuid())
+  fullName        String
+  email           String
+  officialEmail   String?
+  phoneNumber     String
+  projectBudget   String? // e.g., "5k-10k", "10k-25k", etc.
+  projectType     String // e.g., "api-integration", "frontend", "full-stack", etc.
+  projectTimeline String? // e.g., "1-2 weeks", "1 month", "2-3 months", etc.
+  message         String
+  read            Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
+enum product_status {
+  IN_DEVELOPMENT
+  LAUNCING_SOON
+  AVAILABLE
+}
