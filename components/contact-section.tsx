@@ -1,92 +1,92 @@
 "use client";
 
-import type React from "react";
-
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useActionState, startTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-
-const PROJECT_TYPES = [
-	"API Integration",
-	"Frontend Development",
-	"Full-Stack Development",
-	"CI/CD Pipeline",
-	"Figma Design",
-	"Landing Page",
-	"Web Application",
-	"Usability Testing",
-	"Code Review",
-	"Project Management",
-	"Database Management",
-	"Report Generation with SQL",
-];
-
-const BUDGET_RANGES = [
-	"$5,000 - $10,000",
-	"$10,000 - $25,000",
-	"$25,000 - $50,000",
-	"$50,000 - $100,000",
-	"$100,000+",
-];
-
-const PROJECT_TIMELINES = [
-	"1-2 weeks",
-	"3-4 weeks",
-	"1-2 months",
-	"2-3 months",
-	"3+ months",
-];
+import { useEffect } from "react";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import projectEnquiryForm, {
+	type ProjectEnquiryForm,
+	projectTypes,
+	projectTimeLines,
+} from "@/lib/schema/project-enquiry-form-schema";
+import { sendContactEmail } from "@/app/actions/contact-form-action";
 
 export function ContactSection() {
-	const [loading, setLoading] = useState(false);
-	const { toast } = useToast();
+	const [state, formAction, isPending] = useActionState(sendContactEmail, {
+		message: "",
+	});
 
-	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-		e.preventDefault();
-		setLoading(true);
+	const form = useForm<ProjectEnquiryForm>({
+		resolver: zodResolver(projectEnquiryForm),
+		defaultValues: {
+			name: "",
+			email: "",
+			phoneNumber: "",
+			projectType: undefined,
+			projectTimeLine: undefined,
+			estimatedProjectBudget: 0,
+			projectDetails: "",
+		},
+	});
 
-		const formData = new FormData(e.currentTarget);
-		const data = {
-			fullName: formData.get("fullName"),
-			email: formData.get("email"),
-			officialEmail: formData.get("officialEmail") || null,
-			phoneNumber: formData.get("phoneNumber"),
-			projectType: formData.get("projectType"),
-			projectBudget: formData.get("projectBudget") || null,
-			projectTimeline: formData.get("projectTimeline") || null,
-			message: formData.get("message"),
-		};
-
-		try {
-			const response = await fetch("/api/contact", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
-
-			if (response.ok) {
-				toast({
-					title: "Message sent!",
-					description: "Thank you for reaching out. I'll get back to you soon.",
+	// Handle server action response
+	useEffect(() => {
+		if (state.message) {
+			if (state.success) {
+				toast.success("Message sent!", {
+					description: state.message,
 				});
-				e.currentTarget.reset();
+				form.reset();
 			} else {
-				throw new Error("Failed to send message");
+				toast.error("Error", {
+					description: state.message,
+				});
 			}
-		} catch (error) {
-			toast({
-				title: "Error",
-				description: "Failed to send message. Please try again.",
-				variant: "destructive",
-			});
-		} finally {
-			setLoading(false);
 		}
+	}, [state, form]);
+
+	async function onSubmit(values: ProjectEnquiryForm) {
+		// Validate the form first
+		const isValid = await form.trigger();
+		if (!isValid) return;
+
+		// Create FormData and submit via server action
+		const formData = new FormData();
+		formData.append("name", values.name);
+		formData.append("email", values.email);
+		formData.append("phoneNumber", values.phoneNumber);
+		formData.append("projectType", values.projectType);
+		formData.append("projectTimeLine", values.projectTimeLine);
+		formData.append(
+			"estimatedProjectBudget",
+			values.estimatedProjectBudget.toString(),
+		);
+		formData.append("projectDetails", values.projectDetails);
+
+		startTransition(() => {
+			formAction(formData);
+		});
 	}
 
 	return (
@@ -104,138 +104,181 @@ export function ContactSection() {
 					</p>
 				</div>
 				<Card className='p-8'>
-					<form
-						onSubmit={handleSubmit}
-						className='space-y-6'>
-						{/* Full Name and Email */}
-						<div className='grid md:grid-cols-2 gap-6'>
-							<div className='space-y-2'>
-								<Label htmlFor='fullName'>Full Name *</Label>
-								<Input
-									id='fullName'
-									name='fullName'
-									placeholder='Your full name'
-									required
+					<Form {...form}>
+						<form
+							onSubmit={form.handleSubmit(onSubmit)}
+							className='space-y-6'>
+							{/* Name and Email */}
+							<div className='grid md:grid-cols-2 gap-6'>
+								<FormField
+									control={form.control}
+									name='name'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Full Name *</FormLabel>
+											<FormControl>
+												<Input
+													placeholder='Your full name'
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
 								/>
-							</div>
-							<div className='space-y-2'>
-								<Label htmlFor='email'>Email *</Label>
-								<Input
-									id='email'
+								<FormField
+									control={form.control}
 									name='email'
-									type='email'
-									placeholder='your@email.com'
-									required
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Email *</FormLabel>
+											<FormControl>
+												<Input
+													type='email'
+													placeholder='your@email.com'
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
 								/>
 							</div>
-						</div>
 
-						{/* Official Email and Phone */}
-						<div className='grid md:grid-cols-2 gap-6'>
-							<div className='space-y-2'>
-								<Label htmlFor='officialEmail'>Official Email (Optional)</Label>
-								<Input
-									id='officialEmail'
-									name='officialEmail'
-									type='email'
-									placeholder='official@company.com'
-								/>
-							</div>
-							<div className='space-y-2'>
-								<Label htmlFor='phoneNumber'>Phone Number *</Label>
-								<Input
-									id='phoneNumber'
-									name='phoneNumber'
-									placeholder='+1 (555) 000-0000'
-									required
-								/>
-							</div>
-						</div>
-
-						{/* Project Type and Budget */}
-						<div className='grid md:grid-cols-2 gap-6'>
-							<div className='space-y-2'>
-								<Label htmlFor='projectType'>Project Type *</Label>
-								<select
-									id='projectType'
-									name='projectType'
-									className='w-full px-3 py-2 border border-input bg-background rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary'
-									required>
-									<option value=''>Select a project type</option>
-									{PROJECT_TYPES.map((type) => (
-										<option
-											key={type}
-											value={type}>
-											{type}
-										</option>
-									))}
-								</select>
-							</div>
-							<div className='space-y-2'>
-								<Label htmlFor='projectBudget'>Project Budget (Optional)</Label>
-								<select
-									id='projectBudget'
-									name='projectBudget'
-									className='w-full px-3 py-2 border border-input bg-background rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary'>
-									<option value=''>Select budget range</option>
-									{BUDGET_RANGES.map((range) => (
-										<option
-											key={range}
-											value={range}>
-											{range}
-										</option>
-									))}
-								</select>
-							</div>
-						</div>
-
-						{/* Project Timeline */}
-						<div className='space-y-2'>
-							<Label htmlFor='projectTimeline'>
-								Project Timeline (Optional)
-							</Label>
-							<select
-								id='projectTimeline'
-								name='projectTimeline'
-								className='w-full px-3 py-2 border border-input bg-background rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary'>
-								<option value=''>Select project timeline</option>
-								{PROJECT_TIMELINES.map((timeline) => (
-									<option
-										key={timeline}
-										value={timeline}>
-										{timeline}
-									</option>
-								))}
-							</select>
-						</div>
-
-						{/* Message */}
-						<div className='space-y-2'>
-							<Label htmlFor='message'>Project Description *</Label>
-							<Textarea
-								id='message'
-								name='message'
-								placeholder='Tell me about your project, goals, and any specific requirements...'
-								rows={6}
-								required
+							{/* Phone Number */}
+							<FormField
+								control={form.control}
+								name='phoneNumber'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Phone Number *</FormLabel>
+										<FormControl>
+											<Input
+												placeholder='+1 (555) 000-0000'
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
 							/>
-						</div>
 
-						<Button
-							type='submit'
-							size='lg'
-							className='w-full'
-							disabled={loading}>
-							{loading ? (
-								<>
-									<Loader2 className='w-4 h-4 mr-2 animate-spin' />
-									Sending...
-								</>
-							) : (
-								"Send Message"
-							)}
-						</Button>
-					</form>
+							{/* Project Type and Timeline */}
+							<div className='grid md:grid-cols-2 gap-6'>
+								<FormField
+									control={form.control}
+									name='projectType'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Project Type *</FormLabel>
+											<Select
+												onValueChange={field.onChange}
+												defaultValue={field.value}>
+												<FormControl>
+													<SelectTrigger className='w-full'>
+														<SelectValue placeholder='Select a project type' />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent>
+													{projectTypes.map((type) => (
+														<SelectItem
+															key={type}
+															value={type}>
+															{type}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name='projectTimeLine'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Project Timeline *</FormLabel>
+											<Select
+												onValueChange={field.onChange}
+												defaultValue={field.value}>
+												<FormControl>
+													<SelectTrigger className='w-full'>
+														<SelectValue placeholder='Select project timeline' />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent>
+													{projectTimeLines.map((timeline) => (
+														<SelectItem
+															key={timeline}
+															value={timeline}>
+															{timeline}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+
+							{/* Estimated Budget */}
+							<FormField
+								control={form.control}
+								name='estimatedProjectBudget'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Estimated Project Budget (USD) *</FormLabel>
+										<FormControl>
+											<Input
+												type='number'
+												min='50'
+												placeholder='Enter your budget (minimum $50)'
+												{...field}
+												onChange={(e) => field.onChange(Number(e.target.value))}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							{/* Project Details */}
+							<FormField
+								control={form.control}
+								name='projectDetails'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Project Description *</FormLabel>
+										<FormControl>
+											<Textarea
+												placeholder='Tell me about your project, goals, and any specific requirements...'
+												rows={6}
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<Button
+								type='submit'
+								size='lg'
+								className='w-full'
+								disabled={isPending || form.formState.isSubmitting}>
+								{isPending || form.formState.isSubmitting ? (
+									<>
+										<Loader2 className='w-4 h-4 mr-2 animate-spin' />
+										Sending...
+									</>
+								) : (
+									"Send Message"
+								)}
+							</Button>
+						</form>
+					</Form>
 				</Card>
 				<div className='mt-12 text-center space-y-4'>
 					<p className='text-lg text-muted-foreground'>

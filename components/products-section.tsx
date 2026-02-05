@@ -6,20 +6,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-
-interface Product {
-	id: number;
-	name: string;
-	description: string;
-	features: string;
-	status: string;
-	image: string | null;
-	link: string | null;
-	order: number;
-}
+import { product } from "@/generated/prisma";
 
 export function ProductsSection() {
-	const [products, setProducts] = useState<Product[]>([]);
+	const [products, setProducts] = useState<product[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -112,7 +102,13 @@ export function ProductsSection() {
 										<div>
 											<div className='flex items-center gap-3 mb-4'>
 												<h3 className='text-3xl font-bold'>{product.name}</h3>
-												<Badge>{product.status}</Badge>
+												<Badge>
+													{product.status === "IN_DEVELOPMENT"
+														? "IN DEVELOPMENT"
+														: product.status === "LAUNCING_SOON"
+															? "LAUNCING SOON"
+															: product.status}
+												</Badge>
 											</div>
 											<p className='text-muted-foreground leading-relaxed'>
 												{product.description}
@@ -137,10 +133,10 @@ export function ProductsSection() {
 											</Button>
 										)}
 									</div>
-									<div className='relative h-full min-h-[300px] bg-muted rounded-lg overflow-hidden'>
-										{product.image ? (
+									<div className='relative h-full min-h-[300px] bg-muted rounded-lg overflow-hidden border shadow-sm'>
+										{product.link ? (
 											<Image
-												src={product.image || "/placeholder.svg"}
+												src={product.link || "/placeholder.svg"}
 												alt={product.name}
 												fill
 												className='object-cover'
