@@ -2,6 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { useEffect, useState } from "react";
 
 interface Skill {
@@ -35,7 +37,7 @@ export function SkillsSection() {
 				className='relative py-24 px-4'>
 				<div className='container mx-auto max-w-6xl'>
 					<div className='space-y-4 mb-16'>
-						<h2 className='text-4xl md:text-5xl font-bold text-balance'>
+						<h2 className='text-4xl md:text-5xl font-bold text-balance bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 bg-clip-text text-transparent'>
 							Technical Skills
 						</h2>
 						<p className='text-lg lg:text-xl text-muted-foreground max-w-2xl'>
@@ -43,9 +45,23 @@ export function SkillsSection() {
 							technologies to build modern, scalable applications.
 						</p>
 					</div>
-					<Card className='p-8 text-center'>
-						<p className='text-muted-foreground'>Loading skills...</p>
-					</Card>
+					<div className='grid md:grid-cols-3 gap-8'>
+						{[1, 2, 3].map((i) => (
+							<Card
+								key={i}
+								className='p-6'>
+								<Skeleton className='h-6 w-32 mb-4' />
+								<div className='flex flex-wrap gap-2'>
+									{[1, 2, 3, 4, 5].map((j) => (
+										<Skeleton
+											key={j}
+											className='h-6 w-20'
+										/>
+									))}
+								</div>
+							</Card>
+						))}
+					</div>
 				</div>
 			</section>
 		);
@@ -93,33 +109,39 @@ export function SkillsSection() {
 			id='skills'
 			className='relative py-24 px-4'>
 			<div className='container mx-auto max-w-6xl'>
-				<div className='space-y-4 mb-16'>
-					<h2 className='text-4xl md:text-5xl font-bold text-balance'>
-						Technical Skills
-					</h2>
-					<p className='text-lg text-muted-foreground max-w-2xl'>
-						A comprehensive toolkit spanning frontend, backend, and DevOps
-						technologies to build modern, scalable applications.
-					</p>
-				</div>
+				<ScrollReveal>
+					<div className='space-y-4 mb-16'>
+						<h2 className='text-4xl md:text-5xl font-bold text-balance bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 bg-clip-text text-transparent'>
+							Technical Skills
+						</h2>
+						<p className='text-lg text-muted-foreground max-w-2xl'>
+							A comprehensive toolkit spanning frontend, backend, and DevOps
+							technologies to build modern, scalable applications.
+						</p>
+					</div>
+				</ScrollReveal>
 				<div className='grid md:grid-cols-3 gap-8'>
-					{Object.entries(groupedSkills).map(([category, categorySkills]) => (
-						<Card
-							key={category}
-							className='p-6'>
-							<h3 className='text-xl font-bold mb-4'>{category}</h3>
-							<div className='flex flex-wrap gap-2'>
-								{categorySkills.map((skill) => (
-									<Badge
-										key={skill.id}
-										variant='secondary'
-										className='text-sm'>
-										{skill.name}
-									</Badge>
-								))}
-							</div>
-						</Card>
-					))}
+					{Object.entries(groupedSkills).map(
+						([category, categorySkills], index) => (
+							<ScrollReveal
+								key={category}
+								delay={index * 0.1}>
+								<Card className='p-6'>
+									<h3 className='text-xl font-bold mb-4'>{category}</h3>
+									<div className='flex flex-wrap gap-2'>
+										{categorySkills.map((skill) => (
+											<Badge
+												key={skill.id}
+												variant='secondary'
+												className='text-sm'>
+												{skill.name}
+											</Badge>
+										))}
+									</div>
+								</Card>
+							</ScrollReveal>
+						),
+					)}
 				</div>
 			</div>
 		</section>

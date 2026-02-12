@@ -3,6 +3,8 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -32,7 +34,7 @@ export function ProductsSection() {
 				className='relative py-24 px-4 bg-muted/30'>
 				<div className='container mx-auto max-w-6xl'>
 					<div className='space-y-4 mb-16'>
-						<h2 className='text-4xl md:text-5xl font-bold text-balance'>
+						<h2 className='text-4xl md:text-5xl font-bold text-balance bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 bg-clip-text text-transparent'>
 							Products & Solutions
 						</h2>
 						<p className='text-lg text-muted-foreground max-w-2xl'>
@@ -41,9 +43,31 @@ export function ProductsSection() {
 							and business management.
 						</p>
 					</div>
-					<Card className='p-8 text-center'>
-						<p className='text-muted-foreground'>Loading products...</p>
-					</Card>
+					<div className='space-y-8'>
+						{[1, 2].map((i) => (
+							<Card
+								key={i}
+								className='p-8'>
+								<div className='grid lg:grid-cols-2 gap-8'>
+									<div className='space-y-6'>
+										<div className='flex items-center gap-3'>
+											<Skeleton className='h-8 w-48' />
+											<Skeleton className='h-6 w-32' />
+										</div>
+										<Skeleton className='h-4 w-full' />
+										<Skeleton className='h-4 w-5/6' />
+										<div className='space-y-2'>
+											<Skeleton className='h-4 w-3/4' />
+											<Skeleton className='h-4 w-4/5' />
+											<Skeleton className='h-4 w-2/3' />
+										</div>
+										<Skeleton className='h-10 w-32' />
+									</div>
+									<Skeleton className='h-[300px] w-full rounded-lg' />
+								</div>
+							</Card>
+						))}
+					</div>
 				</div>
 			</section>
 		);
@@ -80,75 +104,81 @@ export function ProductsSection() {
 			id='products'
 			className='relative py-24 px-4 bg-muted/30'>
 			<div className='container mx-auto max-w-6xl'>
-				<div className='space-y-4 mb-16'>
-					<h2 className='text-4xl md:text-5xl font-bold text-balance'>
-						Products & Solutions
-					</h2>
-					<p className='text-lg text-muted-foreground max-w-2xl'>
-						Enterprise-ready software solutions designed for modern businesses.
-						Currently developing innovative products for retail and business
-						management.
-					</p>
-				</div>
+				<ScrollReveal>
+					<div className='space-y-4 mb-16'>
+						<h2 className='text-4xl md:text-5xl font-bold text-balance bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 bg-clip-text text-transparent'>
+							Products & Solutions
+						</h2>
+						<p className='text-lg text-muted-foreground max-w-2xl'>
+							Enterprise-ready software solutions designed for modern
+							businesses. Currently developing innovative products for retail
+							and business management.
+						</p>
+					</div>
+				</ScrollReveal>
 				<div className='space-y-8'>
-					{products.map((product) => {
+					{products.map((product, index) => {
 						const features = JSON.parse(product.features) as string[];
 						return (
-							<Card
+							<ScrollReveal
 								key={product.id}
-								className='p-8 hover:shadow-xl transition-shadow'>
-								<div className='grid lg:grid-cols-2 gap-8'>
-									<div className='space-y-6'>
-										<div>
-											<div className='flex items-center gap-3 mb-4'>
-												<h3 className='text-3xl font-bold'>{product.name}</h3>
-												<Badge>
-													{product.status === "IN_DEVELOPMENT"
-														? "IN DEVELOPMENT"
-														: product.status === "LAUNCING_SOON"
-															? "LAUNCING SOON"
-															: product.status}
-												</Badge>
+								delay={index * 0.15}>
+								<Card className='p-8 hover:shadow-xl transition-shadow'>
+									<div className='grid lg:grid-cols-2 gap-8'>
+										<div className='space-y-6'>
+											<div>
+												<div className='flex items-center gap-3 mb-4'>
+													<h3 className='text-3xl font-bold'>{product.name}</h3>
+													<Badge>
+														{product.status === "IN_DEVELOPMENT"
+															? "IN DEVELOPMENT"
+															: product.status === "LAUNCING_SOON"
+																? "LAUNCING SOON"
+																: product.status}
+													</Badge>
+												</div>
+												<p className='text-muted-foreground leading-relaxed'>
+													{product.description}
+												</p>
 											</div>
-											<p className='text-muted-foreground leading-relaxed'>
-												{product.description}
-											</p>
-										</div>
-										<div>
-											<h4 className='font-semibold mb-3'>Key Features:</h4>
-											<ul className='space-y-2'>
-												{features.map((feature, index) => (
-													<li
-														key={index}
-														className='flex gap-2 text-sm'>
-														<span className='text-primary mt-1'>✓</span>
-														<span>{feature}</span>
-													</li>
-												))}
-											</ul>
-										</div>
-										{product.link && (
-											<Button className='gap-2'>
-												Learn More <ArrowRight className='w-4 h-4' />
-											</Button>
-										)}
-									</div>
-									<div className='relative h-full min-h-[300px] bg-muted rounded-lg overflow-hidden border shadow-sm'>
-										{product.link ? (
-											<Image
-												src={product.link || "/placeholder.svg"}
-												alt={product.name}
-												fill
-												className='object-cover'
-											/>
-										) : (
-											<div className='flex items-center justify-center h-full'>
-												<p className='text-muted-foreground'>Product Preview</p>
+											<div>
+												<h4 className='font-semibold mb-3'>Key Features:</h4>
+												<ul className='space-y-2'>
+													{features.map((feature, index) => (
+														<li
+															key={index}
+															className='flex gap-2 text-sm'>
+															<span className='text-primary mt-1'>✓</span>
+															<span>{feature}</span>
+														</li>
+													))}
+												</ul>
 											</div>
-										)}
+											{product.link && (
+												<Button className='gap-2'>
+													Learn More <ArrowRight className='w-4 h-4' />
+												</Button>
+											)}
+										</div>
+										<div className='relative h-full min-h-[300px] bg-muted rounded-lg overflow-hidden border shadow-sm'>
+											{product.link ? (
+												<Image
+													src={product.link || "/placeholder.svg"}
+													alt={product.name}
+													fill
+													className='object-cover'
+												/>
+											) : (
+												<div className='flex items-center justify-center h-full'>
+													<p className='text-muted-foreground'>
+														Product Preview
+													</p>
+												</div>
+											)}
+										</div>
 									</div>
-								</div>
-							</Card>
+								</Card>
+							</ScrollReveal>
 						);
 					})}
 				</div>

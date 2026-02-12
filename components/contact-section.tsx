@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
@@ -94,31 +95,70 @@ export function ContactSection() {
 			id='contact'
 			className='relative py-24 px-4'>
 			<div className='container mx-auto max-w-4xl'>
-				<div className='space-y-4 mb-16 text-center'>
-					<h2 className='text-4xl md:text-5xl font-bold text-balance'>
-						Let's Work Together
-					</h2>
-					<p className='text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto'>
-						Have a project in mind or want to discuss opportunities? I'd love to
-						hear from you.
-					</p>
-				</div>
-				<Card className='p-8'>
-					<Form {...form}>
-						<form
-							onSubmit={form.handleSubmit(onSubmit)}
-							className='space-y-6'>
-							{/* Name and Email */}
-							<div className='grid md:grid-cols-2 gap-6'>
+				<ScrollReveal>
+					<div className='space-y-4 mb-16 text-center'>
+						<h2 className='text-4xl md:text-5xl font-bold text-balance bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 bg-clip-text text-transparent'>
+							Let's Work Together
+						</h2>
+						<p className='text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto'>
+							Have a project in mind or want to discuss opportunities? I'd love
+							to hear from you.
+						</p>
+					</div>
+				</ScrollReveal>
+				<ScrollReveal delay={0.2}>
+					<Card className='p-8'>
+						<Form {...form}>
+							<form
+								onSubmit={form.handleSubmit(onSubmit)}
+								className='space-y-6'>
+								{/* Name and Email */}
+								<div className='grid md:grid-cols-2 gap-6'>
+									<FormField
+										control={form.control}
+										name='name'
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Full Name *</FormLabel>
+												<FormControl>
+													<Input
+														placeholder='Your full name'
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name='email'
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Email *</FormLabel>
+												<FormControl>
+													<Input
+														type='email'
+														placeholder='your@email.com'
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+
+								{/* Phone Number */}
 								<FormField
 									control={form.control}
-									name='name'
+									name='phoneNumber'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Full Name *</FormLabel>
+											<FormLabel>Phone Number *</FormLabel>
 											<FormControl>
 												<Input
-													placeholder='Your full name'
+													placeholder='+1 (555) 000-0000'
 													{...field}
 												/>
 											</FormControl>
@@ -126,16 +166,101 @@ export function ContactSection() {
 										</FormItem>
 									)}
 								/>
+
+								{/* Project Type and Timeline */}
+								<div className='grid md:grid-cols-2 gap-6'>
+									<FormField
+										control={form.control}
+										name='projectType'
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Project Type *</FormLabel>
+												<Select
+													onValueChange={field.onChange}
+													defaultValue={field.value}>
+													<FormControl>
+														<SelectTrigger className='w-full'>
+															<SelectValue placeholder='Select a project type' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{projectTypes.map((type) => (
+															<SelectItem
+																key={type}
+																value={type}>
+																{type}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<FormField
+										control={form.control}
+										name='projectTimeLine'
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Project Timeline *</FormLabel>
+												<Select
+													onValueChange={field.onChange}
+													defaultValue={field.value}>
+													<FormControl>
+														<SelectTrigger className='w-full'>
+															<SelectValue placeholder='Select project timeline' />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{projectTimeLines.map((timeline) => (
+															<SelectItem
+																key={timeline}
+																value={timeline}>
+																{timeline}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+
+								{/* Estimated Budget */}
 								<FormField
 									control={form.control}
-									name='email'
+									name='estimatedProjectBudget'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Email *</FormLabel>
+											<FormLabel>Estimated Project Budget (USD) *</FormLabel>
 											<FormControl>
 												<Input
-													type='email'
-													placeholder='your@email.com'
+													type='number'
+													min='50'
+													placeholder='Enter your budget (minimum $50)'
+													{...field}
+													onChange={(e) =>
+														field.onChange(Number(e.target.value))
+													}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								{/* Project Details */}
+								<FormField
+									control={form.control}
+									name='projectDetails'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Project Description *</FormLabel>
+											<FormControl>
+												<Textarea
+													placeholder='Tell me about your project, goals, and any specific requirements...'
+													rows={6}
 													{...field}
 												/>
 											</FormControl>
@@ -143,143 +268,25 @@ export function ContactSection() {
 										</FormItem>
 									)}
 								/>
-							</div>
 
-							{/* Phone Number */}
-							<FormField
-								control={form.control}
-								name='phoneNumber'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Phone Number *</FormLabel>
-										<FormControl>
-											<Input
-												placeholder='+1 (555) 000-0000'
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							{/* Project Type and Timeline */}
-							<div className='grid md:grid-cols-2 gap-6'>
-								<FormField
-									control={form.control}
-									name='projectType'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Project Type *</FormLabel>
-											<Select
-												onValueChange={field.onChange}
-												defaultValue={field.value}>
-												<FormControl>
-													<SelectTrigger className='w-full'>
-														<SelectValue placeholder='Select a project type' />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{projectTypes.map((type) => (
-														<SelectItem
-															key={type}
-															value={type}>
-															{type}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
+								<Button
+									type='submit'
+									size='lg'
+									className='w-full'
+									disabled={isPending || form.formState.isSubmitting}>
+									{isPending || form.formState.isSubmitting ? (
+										<>
+											<Loader2 className='w-4 h-4 mr-2 animate-spin' />
+											Sending...
+										</>
+									) : (
+										"Send Message"
 									)}
-								/>
-								<FormField
-									control={form.control}
-									name='projectTimeLine'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Project Timeline *</FormLabel>
-											<Select
-												onValueChange={field.onChange}
-												defaultValue={field.value}>
-												<FormControl>
-													<SelectTrigger className='w-full'>
-														<SelectValue placeholder='Select project timeline' />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{projectTimeLines.map((timeline) => (
-														<SelectItem
-															key={timeline}
-															value={timeline}>
-															{timeline}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-
-							{/* Estimated Budget */}
-							<FormField
-								control={form.control}
-								name='estimatedProjectBudget'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Estimated Project Budget (USD) *</FormLabel>
-										<FormControl>
-											<Input
-												type='number'
-												min='50'
-												placeholder='Enter your budget (minimum $50)'
-												{...field}
-												onChange={(e) => field.onChange(Number(e.target.value))}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							{/* Project Details */}
-							<FormField
-								control={form.control}
-								name='projectDetails'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Project Description *</FormLabel>
-										<FormControl>
-											<Textarea
-												placeholder='Tell me about your project, goals, and any specific requirements...'
-												rows={6}
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<Button
-								type='submit'
-								size='lg'
-								className='w-full'
-								disabled={isPending || form.formState.isSubmitting}>
-								{isPending || form.formState.isSubmitting ? (
-									<>
-										<Loader2 className='w-4 h-4 mr-2 animate-spin' />
-										Sending...
-									</>
-								) : (
-									"Send Message"
-								)}
-							</Button>
-						</form>
-					</Form>
-				</Card>
+								</Button>
+							</form>
+						</Form>
+					</Card>
+				</ScrollReveal>
 				<div className='mt-12 text-center space-y-4'>
 					<p className='text-lg text-muted-foreground'>
 						Or reach me directly at
